@@ -39,10 +39,25 @@ app.MapPost("/seed", async (FootballStadiumDb db) =>
     return Results.Created("/seed", "Seeded database with 5 stadiums");
 });
 
+app.MapPost("/stadiums", async (FootballStadiumDb db, AddFootballStadiumRequest request) => {
+    FootballStadium stadium = new()
+    {
+        Name = request.Name,
+        Country = request.Country
+    };
+
+    await db.FootballStadiums.AddAsync(stadium);
+    await db.SaveChangesAsync();
+
+    return Results.Created($"/stadiums/{stadium.Id}", stadium);
+}).Produces<FootballStadium>();
+
+
 app.MapGet("/stadiums", async (FootballStadiumDb db) =>
 {
     return Results.Ok(await db.FootballStadiums.ToListAsync());
 }).Produces<List<FootballStadium>>();
+
 
 app.MapGet("/stadiums/{id}", async (FootballStadiumDb db, Guid id) =>
 {
@@ -55,6 +70,7 @@ app.MapGet("/stadiums/{id}", async (FootballStadiumDb db, Guid id) =>
 
     return Results.Ok(stadium);
 }).Produces<FootballStadium>();
+
 
 app.MapPut("/stadiums/{id}", async (FootballStadiumDb db, Guid id, AddFootballStadiumRequest request) =>
 {
@@ -73,6 +89,7 @@ app.MapPut("/stadiums/{id}", async (FootballStadiumDb db, Guid id, AddFootballSt
 
     return Results.NoContent();
 });
+
 
 app.MapDelete("/stadiums/{id}", async (FootballStadiumDb db, Guid id) =>
 {
